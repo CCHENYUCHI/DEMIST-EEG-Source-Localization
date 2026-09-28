@@ -2,13 +2,10 @@
 
 A self-supervised deep-learning model that estimates brain **source activity**
 from scalp **EEG**, using the physical forward model (leadfield) as the bridge.
-This folder is a cleaned, runnable repackaging of the deep-learning half of the
-multi-modal source-localization project (the ESI / leadfield-building /
-simulation / plotting work lives elsewhere).
-
-> **Data layout:** no dataset ships with this repository.
-> See **`..\DATA_MAP.md`** for exactly where every dataset is on `D:` and which
-> config field points at it. The configs are already filled in for that layout.
+No dataset ships with this repository. The configs use `<DATA_ROOT>` /
+`<RUN_ROOT>` placeholders; point them at your own copies. The pre-trained
+weights and the geometry assets they need are distributed as release
+attachments.
 
 ---
 
@@ -153,26 +150,25 @@ A dataset's `__getitem__` must return this dict; the collator handles padding:
 | `embedding_type` | `leadfield_projection` (trained) or `encoder` | leadfield_projection |
 | `pos_embedding_type` | `Learned` (MLP over xyz) or `sinusoid` | Learned |
 | `regularization_loss` | `eloreta` / `L1` / `L2` / `None` | eloreta |
-| `reg_alpha` | regulariser weight | 0.1 (pretrain), 0.5 (finetune) |
+| `reg_alpha` | regulariser weight | 0.1 |
 
-> ⚠️ **Depth gotcha (kept honest):** in the original notebook `encoder_n=4` /
-> `decoder_n=4` were passed but **never used** — the model has always built its
-> backbone from `config.N` (default **6**). So the released checkpoints have 6
-> layers. `N` is the real knob; `encoder_n`/`decoder_n` are accepted only so old
-> `config.json` files still load. See `eeg_sl/models/config.py`.
+> ⚠️ **Depth gotcha:** `encoder_n` / `decoder_n` appear in the config but have
+> **never had any effect** — the backbone is built from `config.N` (default
+> **6**), so the released checkpoints are 6 layers deep despite carrying 4 in
+> those fields. `N` is the real knob; the other two are accepted only so
+> existing `config.json` files still load, and warn once when they disagree.
+> See `eeg_sl/models/config.py`.
 
 ---
 
-## 6. Notes / provenance
+## 6. Notes
 
-* The model, datasets and collator are extracted verbatim (logic-preserving)
-  from the original `Trainer.ipynb` + `FirstMultiModel/EEGART/tf_model.py` +
-  `DataLoader/SLT_dataloader.py`. Dead experiments (FFT-only variants, VAE
-  variants, ROI/Power/DeepSIF datasets, the old `SLTModel*` classes) were
-  dropped — they remain in the original files / git history if ever needed.
-* The model is time-domain only (the FFT / phasor-loss experiments were
-  removed). The SDPA/flash-attention path (`sdp_attention: true`) is wired up
-  but was **not** part of the trained pipeline; treat it as experimental.
+* The model is time-domain only. The SDPA / flash-attention path
+  (`sdp_attention: true`) is wired up but was **not** part of the trained
+  pipeline; treat it as experimental.
+* `from_pretrained` does not round-trip these configs on `transformers` 5.x.
+  Install the pinned `transformers==4.46.1`, or load the weights manually as
+  shown in `MODEL_CARD.md`.
 * Windows note: `dataloader_num_workers` is fixed to 0 (avoids multiprocessing
   issues on Windows + the head-model objects held in the datasets).
 ```

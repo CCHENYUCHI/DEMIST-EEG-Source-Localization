@@ -18,9 +18,9 @@ Three datasets are used in the pipeline:
   * ``EEG2Source2EEG_epilepsy_Dataset``- BUH epilepsy folder (pre-training)
   * ``HISDataset_BIDS``                - localize-mi intracerebral data (fine-tune/eval)
 
-The original code base loaded a Colin27 EEGLAB head model and aligned both
-source and sensor positions into the MNE ``fsaverage`` coordinate frame; that
-shared logic lives in ``_HeadModelMixin``.
+All of them load a Colin27 EEGLAB head model and align both source and sensor
+positions into the MNE ``fsaverage`` coordinate frame; that shared logic lives
+in ``_HeadModelMixin``.
 """
 
 import os

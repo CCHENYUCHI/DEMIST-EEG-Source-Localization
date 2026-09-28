@@ -4,8 +4,7 @@
 `config.json` and is loaded automatically by `from_pretrained`.
 
 Only the fields actually consumed by `EEG2Source2EEG_autoregressive` are kept
-here.  The original code base inherited from an `ARTConfig`; that hierarchy is
-flattened into this single class for clarity.
+here; unused fields from earlier iterations are not carried over.
 """
 
 import warnings
@@ -24,10 +23,10 @@ class SLTConfig(PretrainedConfig):
         N:                  number of encoder AND decoder layers. This is the
                             field that actually controls backbone depth.
         encoder_n, decoder_n:
-                            LEGACY / UNUSED. In the original notebook these were
-                            passed as 4, but the model has always built its main
-                            encoder/decoder from ``config.N`` (default 6), so
-                            these never took effect. They are kept only so old
+                            LEGACY / UNUSED. Released checkpoints carry 4 here,
+                            but the model has always built its main encoder and
+                            decoder from ``config.N`` (default 6), so these have
+                            never taken effect. They are kept only so existing
                             ``config.json`` files still load. To change depth,
                             set ``N``.
         N_feature_encoder:  depth of the small leadfield/feature encoder.

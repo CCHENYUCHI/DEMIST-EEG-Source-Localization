@@ -2,8 +2,7 @@
 
 These are the standard "Annotated Transformer" style modules (encoder/decoder
 stacks, multi-head attention, position-wise FFN, positional encoding) plus a few
-projector heads.  They are copied from the original ``tf_model.py`` with the dead
-classes removed and the debug ``draw()`` / ``torch.profiler`` calls stripped out.
+projector heads.  Variants that were never trained are omitted.
 """
 
 import copy
