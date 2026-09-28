@@ -1,8 +1,7 @@
 # ==========================================================================
 #  Pre-training config: self-supervised EEG -> Source -> EEG.
 #  Paths below are placeholders: replace <DATA_ROOT> / <RUN_ROOT> with your
-#  own locations.  None of these datasets ship with the repository -- see
-#  DATA.md for what each one is and where to obtain it.
+#  own locations.  No dataset ships with this repository.
 #      python scripts/train.py --config configs/pretrain.yaml
 #  Quick override example:
 #      python scripts/train.py --config configs/pretrain.yaml --set training.batch_size=8

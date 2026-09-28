@@ -20,8 +20,7 @@ pretrained:
   reg_alpha_override: 0.1
 
 data:
-  # Localize-MI, BIDS layout. Public dataset -- not redistributed with this
-  # repository. See DATA.md for where to obtain it.
+  # Localize-MI, BIDS layout. Public dataset, not redistributed here.
   dir_bids: "<PATH>/localize-mi"
   task: "seegstim"
   # The reported run fine-tuned on these four subjects and evaluated on all

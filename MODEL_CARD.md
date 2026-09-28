@@ -56,8 +56,7 @@ to the limits below.
 | EEGLAB/FieldTrip simulation (Colin27 5003) | 62 | single / double / multiple source |
 | Resting-state, epilepsy sets | 30 / varies | present in the config, disabled for the released model |
 
-Not redistributed with this repository — see `DATA.md` for where to obtain each
-one and the expected file layout.
+None of these are redistributed with this repository.
 
 **Pre-processing is deliberately minimal**: a single global z-score per trial.
 No filtering, no re-referencing, no baseline correction. Bad channels are
