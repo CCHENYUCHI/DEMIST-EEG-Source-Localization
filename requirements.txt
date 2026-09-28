@@ -1,0 +1,45 @@
+# ---------------------------------------------------------------------------
+#  Pinned to the stack that produced the released checkpoints.
+#
+#  transformers is the one that really matters.  The checkpoints' config.json
+#  records 4.46.1, and `from_pretrained` does NOT round-trip these configs on
+#  transformers 5.x -- it raises rather than loading.  Either install the pin
+#  below, or load the weights manually (see README "Loading a checkpoint"):
+#
+#      from safetensors.torch import load_file
+#      cfg = SLTConfig.from_pretrained(ckpt)
+#      model = EEG2Source2EEG_autoregressive(cfg)
+#      model.load_state_dict(load_file(ckpt + '/model.safetensors'), strict=False)
+#
+#  `strict=False` is required: the sinusoidal positional-encoding tables are
+#  deterministic buffers that are rebuilt identically at __init__.
+# ---------------------------------------------------------------------------
+
+# Core deep-learning stack
+torch>=2.1                # needs torch.nn.attention.SDPBackend (PyTorch 2.1+)
+transformers==4.46.1      # the version the checkpoints were trained/saved with
+safetensors>=0.4
+numpy
+scipy
+h5py
+
+# EEG / source-space handling
+mne>=1.5
+mne-bids
+
+# Misc
+scikit-learn              # KMeans for leadfield source reduction
+pyyaml                    # config files
+tqdm
+natsort                   # used by bids_io
+pandas
+wandb                     # experiment logging (optional, can be disabled)
+
+# ---------------------------------------------------------------------------
+#  Also verified to run inference with manual weight loading (not from_pretrained):
+#    torch 2.9.1+cu130, transformers 5.7.0, numpy 2.1.3, scipy 1.14.1,
+#    scikit-learn 1.5.2, pandas 2.2.3, mne 1.8.0, h5py 3.12.1, safetensors 0.7.0
+#
+#  Windows note: `import torch` BEFORE `import pandas`. The reverse order can
+#  abort the process with a c10.dll conflict.
+# ---------------------------------------------------------------------------

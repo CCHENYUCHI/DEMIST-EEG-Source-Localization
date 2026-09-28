@@ -1,0 +1,90 @@
+# ==========================================================================
+#  Pre-training config: self-supervised EEG -> Source -> EEG.
+#  Paths below are placeholders: replace <DATA_ROOT> / <RUN_ROOT> with your
+#  own locations.  None of these datasets ship with the repository -- see
+#  DATA.md for what each one is and where to obtain it.
+#      python scripts/train.py --config configs/pretrain.yaml
+#  Quick override example:
+#      python scripts/train.py --config configs/pretrain.yaml --set training.batch_size=8
+# ==========================================================================
+
+run_name: "leadfield_autoregressive_pretrain"
+
+# --- which data sources to mix in (toggle True/False) ---------------------
+datasets:
+  use_ssvep: true
+  use_resting: false
+  use_epilepsy: false
+  use_simulated: true
+
+  leadfield_reduction: false        # reduce 5003 sources to ~1000 via KMeans
+  n_per_dataset_train: 60000        # cap each enabled source (train)
+  n_per_dataset_val: 250            # cap each enabled source (val)
+
+  # Shared EEGLAB Colin27 head model (copied from Google Drive into shared_assets)
+  head_model_path: "<DATA_ROOT>/assets/head_modelColin27_5003_Standard-10-5-Cap339.mat"
+
+  ssvep:                            # Tsinghua SSVEP  (Tsinghua SSVEP, 62ch)
+    train_path: "<DATA_ROOT>/tsinghua_ssvep/train_eeg.npy"
+    val_path: "<DATA_ROOT>/tsinghua_ssvep/val_eeg.npy"
+    leadfield_path: "<DATA_ROOT>/tsinghua_ssvep/_62_leadfield.mat"
+    eloreta_weight_path: "<DATA_ROOT>/tsinghua_ssvep/_62_eloreta_weight.mat"
+
+  resting:                          # resting state  (30ch)
+    train_path: "<DATA_ROOT>/resting_state/train_eeg.npy"
+    val_path: "<DATA_ROOT>/resting_state/val_eeg.npy"
+    leadfield_path: "<DATA_ROOT>/resting_state/leadfield.mat"
+    eloreta_weight_path: "<DATA_ROOT>/resting_state/_30_eloreta_weight.mat"
+
+  epilepsy:                         # BUH epilepsy  (per-subject subfolders)
+    train_folder: "<DATA_ROOT>/buh_epilepsy/train"
+    val_folder: "<DATA_ROOT>/buh_epilepsy/val"
+
+  simulated:                        # EEGLAB simulation (copied into shared_assets)
+    leadfield_path: "<DATA_ROOT>/tsinghua_ssvep/_62_leadfield.mat"   # uses the SSVEP 62ch leadfield
+    train_paths:
+      - "<DATA_ROOT>/assets/EEGLAB_Simulation/double_source_simulate_training_data.mat"
+      - "<DATA_ROOT>/assets/EEGLAB_Simulation/multiple_source_simulate_training_data.mat"
+      - "<DATA_ROOT>/assets/EEGLAB_Simulation/single_source_simulate_training_data.mat"
+    val_paths:
+      - "<DATA_ROOT>/assets/EEGLAB_Simulation/double_source_simulate_val_data.mat"
+      - "<DATA_ROOT>/assets/EEGLAB_Simulation/multiple_source_simulate_val_data.mat"
+      - "<DATA_ROOT>/assets/EEGLAB_Simulation/single_source_simulate_val_data.mat"
+
+# --- model architecture (-> SLTConfig) ------------------------------------
+model:
+  d_model: 256
+  d_ff: 1024
+  h: 8
+  dropout: 0.1
+  N: 6                              # encoder AND decoder depth (see config.py note)
+  N_feature_encoder: 1
+  sensor_time: 200                 # EEG samples per window
+  source_voxel_time: 600           # 3 axes * 200 time
+  tgt_len: 5003                    # source voxel count
+  K: 150                           # source voxels decoded per autoregressive step
+  use_embedding: true
+  embedding_type: "leadfield_projection"   # or "encoder"
+  pos_embedding_type: "Learned"            # or "sinusoid"
+  use_generator: "linear"
+  sdp_attention: false
+  regularization_loss: "eloreta"           # eloreta | L1 | L2 | None
+  reg_alpha: 0.1
+
+# --- HuggingFace TrainingArguments ----------------------------------------
+training:
+  output_base_dir: "<RUN_ROOT>/checkpoints"
+  batch_size: 16
+  num_epochs: 80                 # pre-training was interrupted and resumed,
+                                 # so 80 is the total across the two runs;
+                                 # a single trainer_state.json shows fewer
+  learning_rate: 0.0001
+  weight_decay: 0.01
+  lr_scheduler_type: "constant_with_warmup"
+  bf16: true                       # set false + fp16 true on pre-Ampere GPUs
+  fp16: false
+
+# --- experiment logging ----------------------------------------------------
+wandb:
+  enabled: false                   # set true + `wandb login` to log online
+  project: "ablation_study"

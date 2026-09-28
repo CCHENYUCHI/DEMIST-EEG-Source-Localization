@@ -1,0 +1,45 @@
+# ==========================================================================
+#  Fine-tuning config: adapt a pre-trained checkpoint to the Localize-MI
+#  intracerebral-stimulation (HIS) subjects.
+#      python scripts/finetune.py --config configs/finetune.yaml
+#
+#  The values below are the ones that produced the fine-tuned model reported in
+#  the paper, read back from that run's `training_args.bin` and `config.json`.
+#  (An earlier version of this file shipped placeholder defaults -- volume
+#  source model, batch 18, reg_alpha 0.5 -- that were never used for any
+#  reported result.  Do not reintroduce them.)
+# ==========================================================================
+
+run_name_prefix: "finetune_HIS"
+
+pretrained:
+  # The pre-training checkpoint to start from.
+  checkpoint_path: "<PATH>/checkpoints/<PRETRAIN_RUN>/checkpoint-<STEP>"
+  # Keep 0.1: this is the value the reported fine-tuning inherited from the
+  # pre-trained checkpoint.  null keeps whatever the checkpoint carries.
+  reg_alpha_override: 0.1
+
+data:
+  # Localize-MI, BIDS layout. Public dataset -- not redistributed with this
+  # repository. See DATA.md for where to obtain it.
+  dir_bids: "<PATH>/localize-mi"
+  task: "seegstim"
+  # The reported run fine-tuned on these four subjects and evaluated on all
+  # seven, so sub-05..07 are held out.
+  subjects: ["sub-01", "sub-02", "sub-03", "sub-04"]
+  use_source_model: "surface"             # "surface" (reported) or "volume"
+  use_elect_align_method: "traditional"   # "traditional" or "globalrescale"
+  use_eloreta_weight: true
+  window_size: 200
+
+training:
+  output_base_dir: "<PATH>/checkpoints"
+  batch_size: 6
+  num_epochs: 50
+  learning_rate: 0.00005          # 1/2 of pre-training
+  bf16: true
+  fp16: false
+
+wandb:
+  enabled: false
+  project: "finetune_source"

@@ -1,0 +1,18 @@
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+env/
+
+# never commit data or weights to git -- release weights as GitHub Release
+# assets or on HuggingFace, and keep datasets out entirely
+*.mat
+*.npy
+*.npz
+*.safetensors
+*.pt
+*.pth
+*.bin
+checkpoints/
+inference_results/
+wandb/

@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software or the released weights, please cite it."
+title: "DEMIST: self-supervised EEG source imaging with a leadfield-conditioned transformer"
+authors:
+  # Add co-authors here as further list entries, e.g. the supervising PI.
+  - family-names: "Chen"
+    given-names: "Yu-Chi"
+    affiliation: "CNE Lab"
+version: "0.1.0"
+date-released: "2026-09-28"
+repository-code: "https://github.com/CCHENYUCHI/DEMIST-EEG-Source-Localization"

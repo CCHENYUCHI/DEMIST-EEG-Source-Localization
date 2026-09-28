@@ -1,0 +1,25 @@
+# ==========================================================================
+#  Inference config: run a (fine-tuned) model over HIS subjects and save the
+#  estimated source activity (model `hidden_states`) per run as .mat files.
+#      python scripts/inference.py --config configs/inference.yaml
+# ==========================================================================
+
+model:
+  # The fine-tuned model directory (with config.json + weights).
+  # >>> EDIT this to your fine-tuned model folder <<<
+  checkpoint_path: "<RUN_ROOT>/checkpoints/<FINETUNE_RUN>/final_finetuned_model"
+
+data:
+  dir_bids: "<DATA_ROOT>/localize-mi"
+  task: "seegstim"
+  subjects: ["sub-05", "sub-06", "sub-07"]
+  use_source_model: "volume"       # must match how the model was fine-tuned
+  use_elect_align_method: "traditional"
+  use_eloreta_weight: true
+  window_size: 200
+
+inference:
+  output_dir: "<RUN_ROOT>/inference_results/HIS_source_voxel_data"
+  batch_size: 80
+  num_workers: 0
+  save_format: "mat"
